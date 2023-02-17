@@ -3,11 +3,13 @@ package com.walletapi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * main class.
+ */
 @SpringBootApplication
 public class WalletApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(WalletApiApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(WalletApiApplication.class, args);
+  }
 }
