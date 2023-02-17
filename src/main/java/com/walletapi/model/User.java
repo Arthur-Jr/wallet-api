@@ -2,6 +2,7 @@ package com.walletapi.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -12,6 +13,7 @@ public class User {
   @Id
   private String id;
 
+  @Indexed(unique = true)
   private String username;
 
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -28,7 +30,7 @@ public class User {
   public String getUsername() {
     return username;
   }
-  
+
   public void setPassword(String password) {
     this.password = password;
   }
