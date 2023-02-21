@@ -5,6 +5,7 @@ import com.walletapi.exceptions.UserNotFoundException;
 import com.walletapi.model.User;
 import com.walletapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,13 +16,16 @@ public class UserService {
   @Autowired
   private UserRepository userRepo;
 
+  @Autowired
+  private PasswordEncoder encoder;
+
   /**
    * Register new user method.
    */
   public User registerUser(UserDto userPayload) {
     User user = new User();
     user.setUsername(userPayload.getUsername());
-    user.setPassword(userPayload.getPassword());
+    user.setPassword(this.encoder.encode(userPayload.getPassword()));
 
     return this.userRepo.save(user);
   }
