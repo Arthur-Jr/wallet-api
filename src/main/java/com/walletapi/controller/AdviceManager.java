@@ -4,8 +4,11 @@ import com.mongodb.MongoException;
 import com.mongodb.MongoWriteException;
 import com.walletapi.exceptions.DataError;
 import com.walletapi.exceptions.ExceptionsMessages;
+import com.walletapi.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -21,7 +24,24 @@ public class AdviceManager {
   @ExceptionHandler(MongoException.class)
   public ResponseEntity<DataError> handleDuplicity(MongoWriteException e) {
     DataError errorResponse = new DataError(ExceptionsMessages.USERNAME_ALREADY_EXISTS);
-
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<DataError> handleAuthenticationError(AuthenticationException e) {
+    DataError errorResponse = new DataError(ExceptionsMessages.INVALID_LOGIN);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
+
+  @ExceptionHandler({UserNotFoundException.class, UsernameNotFoundException.class})
+  public ResponseEntity<DataError> handleUserNotFoundError(Exception e) {
+    DataError errorResponse = new DataError(ExceptionsMessages.USER_NOT_FOUND);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
+
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<DataError> handleInternalError(Exception e) {
+    DataError errorResponse = new DataError(ExceptionsMessages.INTERNAL);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
   }
 }

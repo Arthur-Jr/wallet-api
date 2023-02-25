@@ -1,5 +1,6 @@
 package com.walletapi.controller;
 
+import com.walletapi.domain.TokenResponse;
 import com.walletapi.domain.UserDto;
 import com.walletapi.model.User;
 import com.walletapi.service.UserService;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,13 +25,19 @@ public class UserController {
   private UserService service;
 
   @PostMapping
-  public ResponseEntity<User> registerUser(@Valid @RequestBody UserDto userPayload) {
-    User newUser = this.service.registerUser(userPayload);
-    return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+  public ResponseEntity<TokenResponse> registerUser(@Valid @RequestBody UserDto userPayload) {
+    TokenResponse token = this.service.registerUser(userPayload);
+    return ResponseEntity.status(HttpStatus.CREATED).body(token);
   }
 
-  @GetMapping("/{username}")
-  public User getUserByUsername(@PathVariable String username) {
-    return this.service.getUserByUsername(username);
+  @GetMapping
+  public User getUserByUsername() {
+    return this.service.getUserByUsername();
   }
+
+  @PostMapping("/login")
+  public TokenResponse login(@Valid @RequestBody UserDto userPayload) {
+    return this.service.login(userPayload);
+  }
+
 }

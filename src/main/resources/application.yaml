@@ -1,0 +1,11 @@
+server:
+  port: 8080
+spring:
+  config:
+    import: secrets.properties
+  data:
+    mongodb:
+      uri:
+        mongodb://${MONGODB_USER:root}:${MONGODB_PASS:root}@${MONGODB_HOST:localhost}:${MONGODB_HOST:27017}/wallet?authSource=admin
+      database: wallet
+      auto-index-creation: true
