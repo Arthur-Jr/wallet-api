@@ -32,6 +32,7 @@ public class WebSecurityConfig {
     http.csrf().disable()
         .authorizeHttpRequests()
         .requestMatchers(HttpMethod.POST, "/user").permitAll()
+        .requestMatchers(HttpMethod.POST, "/user/login").permitAll()
         .anyRequest().authenticated()
         .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and().authenticationProvider(authenticationProvider)
