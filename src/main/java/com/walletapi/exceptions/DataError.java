@@ -1,23 +1,15 @@
 package com.walletapi.exceptions;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * Default error response.
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DataError {
   private String message;
-
-  public DataError() {
-  }
-
-  public DataError(String message) {
-    this.message = message;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
 }
