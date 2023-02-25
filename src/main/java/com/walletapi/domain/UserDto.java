@@ -1,33 +1,20 @@
 package com.walletapi.domain;
 
 import com.walletapi.exceptions.ExceptionsMessages;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 /**
  * user DTO.
  */
+@Data
 public class UserDto {
   @NotEmpty(message = ExceptionsMessages.EMPTY_USERNAME)
-  @Size(min = 3, message = ExceptionsMessages.USERNAME_SIZE)
+  @Email(message = ExceptionsMessages.INVALID_EMAIL,
+      regexp = "(^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$)")
   private String username;
-  
+
   @NotEmpty(message = ExceptionsMessages.EMPTY_PASSWORD)
   private String password;
-
-  public String getUsername() {
-    return username;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
 }

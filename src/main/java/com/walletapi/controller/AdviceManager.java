@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -38,6 +39,13 @@ public class AdviceManager {
     DataError errorResponse = new DataError(ExceptionsMessages.USER_NOT_FOUND);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<DataError> handleInvalidEmail(MethodArgumentNotValidException e) {
+    DataError errorResponse = new DataError(e.getFieldError().getDefaultMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
+
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<DataError> handleInternalError(Exception e) {
