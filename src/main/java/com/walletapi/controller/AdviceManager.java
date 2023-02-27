@@ -7,6 +7,7 @@ import com.walletapi.exceptions.ExceptionsMessages;
 import com.walletapi.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -46,6 +47,11 @@ public class AdviceManager {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<DataError> handleInvalidMethodOrTag(HttpMessageNotReadableException e) {
+    DataError errorResponse = new DataError(ExceptionsMessages.INVALID_TAG_METHOD);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<DataError> handleInternalError(Exception e) {
