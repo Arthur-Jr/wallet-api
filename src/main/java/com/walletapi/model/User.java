@@ -24,7 +24,7 @@ public class User implements UserDetails {
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String password;
 
-  private final List<Expense> expenseList = new ArrayList<>();
+  private List<Expense> expenseList = new ArrayList<>();
 
   public String getId() {
     return id;
