@@ -5,6 +5,7 @@ import com.walletapi.exceptions.ExpenseNotFoundException;
 import com.walletapi.model.Expense;
 import com.walletapi.model.User;
 import com.walletapi.repositories.UserRepository;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ public class ExpenseService {
     newExpense.setDescription(expensePayload.getDescription());
     newExpense.setMethod(expensePayload.getMethod());
     newExpense.setTag(expensePayload.getTag());
+    newExpense.setCreatedAt(LocalDateTime.now().withNano(0));
 
     user.addExpense(newExpense);
     this.userRepo.save(user);
