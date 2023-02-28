@@ -17,4 +17,5 @@ public class ExceptionsMessages {
   public static final String EMPTY_CURRENCY = "Expense currency is required!";
   public static final String EMPTY_TAG = "Expense tag is required!";
   public static final String EMPTY_METHOD = "Expense payment method is required!";
+  public static final String EXPENSE_NOT_FOUND = "Expense not found!";
 }
