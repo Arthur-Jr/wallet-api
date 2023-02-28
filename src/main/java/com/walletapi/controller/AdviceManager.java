@@ -4,9 +4,12 @@ import com.mongodb.MongoException;
 import com.mongodb.MongoWriteException;
 import com.walletapi.exceptions.DataError;
 import com.walletapi.exceptions.ExceptionsMessages;
+import com.walletapi.exceptions.ExpenseNotFoundException;
 import com.walletapi.exceptions.UserNotFoundException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,7 +25,7 @@ public class AdviceManager {
   /**
    * Username duplicity handle.
    */
-  @ExceptionHandler(MongoException.class)
+  @ExceptionHandler({MongoException.class, DuplicateKeyException.class})
   public ResponseEntity<DataError> handleDuplicity(MongoWriteException e) {
     DataError errorResponse = new DataError(ExceptionsMessages.USERNAME_ALREADY_EXISTS);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -34,10 +37,14 @@ public class AdviceManager {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 
-  @ExceptionHandler({UserNotFoundException.class, UsernameNotFoundException.class})
+  @ExceptionHandler({
+      UserNotFoundException.class,
+      UsernameNotFoundException.class,
+      ExpenseNotFoundException.class
+  })
   public ResponseEntity<DataError> handleUserNotFoundError(Exception e) {
-    DataError errorResponse = new DataError(ExceptionsMessages.USER_NOT_FOUND);
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    DataError errorResponse = new DataError(e.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -46,10 +53,19 @@ public class AdviceManager {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<DataError> handleInvalidMethodOrTag(HttpMessageNotReadableException e) {
+    DataError errorResponse = new DataError(ExceptionsMessages.INVALID_TAG_METHOD);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
 
+  /**
+   * Internal server error handler.
+   */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<DataError> handleInternalError(Exception e) {
     DataError errorResponse = new DataError(ExceptionsMessages.INTERNAL);
+    System.out.println(e.getClass());
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
   }
 }
