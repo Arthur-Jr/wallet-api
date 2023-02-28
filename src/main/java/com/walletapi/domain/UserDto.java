@@ -3,6 +3,7 @@ package com.walletapi.domain;
 import com.walletapi.exceptions.ExceptionsMessages;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -16,5 +17,6 @@ public class UserDto {
   private String username;
 
   @NotEmpty(message = ExceptionsMessages.EMPTY_PASSWORD)
+  @Size(min = 6, message = ExceptionsMessages.PASSWORD_SIZE)
   private String password;
 }
