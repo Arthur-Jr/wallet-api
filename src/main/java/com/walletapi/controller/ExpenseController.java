@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,4 +40,16 @@ public class ExpenseController {
     this.expenseService.removeExpense(expenseId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
+
+  /**
+   * Edit Expense method.
+   */
+  @PutMapping("/{expenseId}")
+  public ResponseEntity<Expense> editExpense(@PathVariable UUID expenseId,
+                                             @RequestBody Expense payload) {
+
+    Expense editedExpense = this.expenseService.editExpense(expenseId, payload);
+    return ResponseEntity.ok(editedExpense);
+  }
+
 }
