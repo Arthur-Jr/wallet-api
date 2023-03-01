@@ -7,6 +7,7 @@ import com.walletapi.exceptions.UserNotFoundException;
 import com.walletapi.jwt.JwtService;
 import com.walletapi.model.User;
 import com.walletapi.repositories.UserRepository;
+import com.walletapi.service.UserDetailsServiceImp;
 import com.walletapi.service.UserService;
 import com.walletapi.util.UserDataExample;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +41,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class UserServiceTests {
   @InjectMocks
   private UserService userService;
+
+  @InjectMocks
+  private UserDetailsServiceImp userDetailsService;
 
   @Mock
   private UserRepository userRepository;
@@ -147,6 +153,33 @@ public class UserServiceTests {
     verify(this.userRepository, times(1))
         .findByUsername(UserDataExample.USERNAME);
     verify(this.jwtService, times(1)).generateToken(this.user);
+  }
+
+  @Test
+  @DisplayName("User Details service test: LoadByUsername test, should return userDetails")
+  void should_return_userDetails() {
+    when(this.userRepository.findByUsername(UserDataExample.USERNAME)).thenReturn(this.user);
+    UserDetails user = this.userDetailsService.loadUserByUsername(UserDataExample.USERNAME);
+
+    assertNotNull(user);
+    assertEquals(user.getUsername(), this.user.getUsername());
+    verify(this.userRepository, times(1))
+        .findByUsername(UserDataExample.USERNAME);
+  }
+
+  @Test
+  @DisplayName("User Details service test: LoadByUsername test, should throw if user not found")
+  void should_throw_UsernameNotFound_exception() {
+    when(this.userRepository.findByUsername(UserDataExample.USERNAME))
+        .thenThrow(UsernameNotFoundException.class);
+
+    Throwable exception = assertThrows(
+        UsernameNotFoundException.class,
+        () -> this.userDetailsService.loadUserByUsername(UserDataExample.USERNAME)
+    );
+    assertNotNull(exception);
+    verify(this.userRepository, times(1))
+        .findByUsername(UserDataExample.USERNAME);
   }
 
   private void mockSecurityContextHolder() {
