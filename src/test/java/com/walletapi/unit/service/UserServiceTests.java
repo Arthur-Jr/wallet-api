@@ -26,6 +26,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.any;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,6 +47,9 @@ public class UserServiceTests {
 
   @Mock
   private PasswordEncoder encoder;
+
+  @Mock
+  private AuthenticationManager authenticationManager;
 
   private final UserDto userDto = new UserDto();
   private final User user = new User();
@@ -69,6 +74,7 @@ public class UserServiceTests {
 
     assertNotNull(token);
     assertEquals(token.getClass(), TokenResponse.class);
+    assertNotNull(token.getToken());
     verify(this.userRepository, times(1)).save(any(User.class));
     verify(this.jwtService, times(1)).generateToken(this.user);
     verify(this.encoder, times(1)).encode(this.userDto.getPassword());
@@ -120,6 +126,27 @@ public class UserServiceTests {
         .getPrincipal();
     verify(this.userRepository, times(1))
         .findByUsername(UserDataExample.USERNAME);
+  }
+
+  @Test
+  @DisplayName("Login test: Should have success on login")
+  void should_login() {
+    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+        this.userDto.getUsername(),
+        this.userDto.getPassword()
+    );
+    when(this.authenticationManager.authenticate(token)).thenReturn(null);
+    when(this.userRepository.findByUsername(UserDataExample.USERNAME)).thenReturn(this.user);
+    when(this.jwtService.generateToken(this.user)).thenReturn(this.JWT_TOKEN_EX);
+    TokenResponse userToken = this.userService.login(this.userDto);
+
+    assertNotNull(userToken);
+    assertEquals(userToken.getClass(), TokenResponse.class);
+    assertNotNull(userToken.getToken());
+    verify(this.authenticationManager, times(1)).authenticate(token);
+    verify(this.userRepository, times(1))
+        .findByUsername(UserDataExample.USERNAME);
+    verify(this.jwtService, times(1)).generateToken(this.user);
   }
 
   private void mockSecurityContextHolder() {
