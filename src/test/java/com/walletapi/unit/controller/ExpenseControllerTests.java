@@ -31,7 +31,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.ArgumentMatchers.any;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -164,6 +163,61 @@ public class ExpenseControllerTests {
     response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.message").value(ExceptionsMessages.EXPENSE_NOT_FOUND));
+  }
+
+  @Test
+  @DisplayName("Expense DTO validation tests: empty tag test")
+  void empty_tag_test() throws Exception {
+    this.expenseDto.setTag(null);
+    ResultActions response = this.addNewExpense(this.expenseDto);
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.EMPTY_TAG));
+  }
+
+  @Test
+  @DisplayName("Expense DTO validation tests: empty method test")
+  void empty_method_test() throws Exception {
+    this.expenseDto.setMethod(null);
+    ResultActions response = this.addNewExpense(this.expenseDto);
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.EMPTY_METHOD));
+  }
+
+  @Test
+  @DisplayName("Expense DTO validation tests: empty value test")
+  void empty_value_test() throws Exception {
+    this.expenseDto.setValue(null);
+    ResultActions response = this.addNewExpense(this.expenseDto);
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.EMPTY_VALUE));
+  }
+
+  @Test
+  @DisplayName("Expense DTO validation tests: empty description test")
+  void empty_description_test() throws Exception {
+    this.expenseDto.setDescription(null);
+    ResultActions response = this.addNewExpense(this.expenseDto);
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.EMPTY_DESCRIPTION));
+  }
+
+  @Test
+  @DisplayName("Expense DTO validation tests: empty currency test")
+  void empty_currency_test() throws Exception {
+    this.expenseDto.setCurrency(null);
+    ResultActions response = this.addNewExpense(this.expenseDto);
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.EMPTY_CURRENCY));
   }
 
   private ResultActions editExpense(Expense payload, UUID expenseId) throws Exception {
