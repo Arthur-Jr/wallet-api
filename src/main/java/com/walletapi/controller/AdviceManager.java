@@ -27,13 +27,13 @@ public class AdviceManager {
   @ExceptionHandler({MongoException.class, DuplicateKeyException.class})
   public ResponseEntity<DataError> handleDuplicity(Exception e) {
     DataError errorResponse = new DataError(ExceptionsMessages.USERNAME_ALREADY_EXISTS);
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
   }
 
   @ExceptionHandler(AuthenticationException.class)
   public ResponseEntity<DataError> handleAuthenticationError(AuthenticationException e) {
     DataError errorResponse = new DataError(ExceptionsMessages.INVALID_LOGIN);
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
   }
 
   @ExceptionHandler({
@@ -47,7 +47,7 @@ public class AdviceManager {
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<DataError> handleInvalidEmail(MethodArgumentNotValidException e) {
+  public ResponseEntity<DataError> handleInvalidField(MethodArgumentNotValidException e) {
     DataError errorResponse = new DataError(e.getFieldError().getDefaultMessage());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
