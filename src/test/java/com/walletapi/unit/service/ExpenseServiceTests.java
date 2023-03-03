@@ -119,4 +119,25 @@ public class ExpenseServiceTests {
     verify(this.userService, times(1)).getUserByUsername();
   }
 
+  @Test
+  void test() {
+    Expense expensePayload = new Expense();
+    expensePayload.setValue(50.00);
+    expensePayload.setDescription("Edited expense");
+    when(this.userService.getUserByUsername()).thenReturn(this.user);
+    when(this.userRepository.save(any(User.class))).thenReturn(this.user);
+
+    Expense editedEx = this.expenseService.editExpense(this.expense.getExpenseId(), expensePayload);
+
+    assertNotNull(editedEx);
+    assertEquals(this.expense.getExpenseId(), editedEx.getExpenseId());
+    assertEquals(expensePayload.getValue(), editedEx.getValue());
+    assertEquals(expensePayload.getDescription(), editedEx.getDescription());
+    assertEquals(this.expense.getCurrency(), editedEx.getCurrency());
+    assertEquals(this.expense.getMethod(), editedEx.getMethod());
+    assertEquals(this.expense.getTag(), editedEx.getTag());
+    assertEquals(this.expense.getCreatedAt(), editedEx.getCreatedAt());
+    verify(this.userService, times(1)).getUserByUsername();
+    verify(this.userRepository, times(1)).save(any(User.class));
+  }
 }
