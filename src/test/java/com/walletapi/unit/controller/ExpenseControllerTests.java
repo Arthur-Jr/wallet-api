@@ -79,6 +79,7 @@ public class ExpenseControllerTests {
     response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.expenseId").exists());
+    verify(this.expenseService, times(1)).addExpense(this.expenseDto);
   }
 
   @Test
@@ -88,6 +89,8 @@ public class ExpenseControllerTests {
     ResultActions response = this.removeExpense(this.expense.getExpenseId());
 
     response.andExpect(status().isNoContent());
+    verify(this.expenseService, times(1))
+        .removeExpense(this.expense.getExpenseId());
   }
 
   @Test
@@ -101,6 +104,8 @@ public class ExpenseControllerTests {
     response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.message").value(ExceptionsMessages.USER_NOT_FOUND));
+    verify(this.expenseService, times(1))
+        .removeExpense(this.expense.getExpenseId());
   }
 
   @Test
