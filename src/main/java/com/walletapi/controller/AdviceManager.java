@@ -1,7 +1,6 @@
 package com.walletapi.controller;
 
 import com.mongodb.MongoException;
-import com.mongodb.MongoWriteException;
 import com.walletapi.exceptions.DataError;
 import com.walletapi.exceptions.ExceptionsMessages;
 import com.walletapi.exceptions.ExpenseNotFoundException;
@@ -26,7 +25,7 @@ public class AdviceManager {
    * Username duplicity handle.
    */
   @ExceptionHandler({MongoException.class, DuplicateKeyException.class})
-  public ResponseEntity<DataError> handleDuplicity(MongoWriteException e) {
+  public ResponseEntity<DataError> handleDuplicity(Exception e) {
     DataError errorResponse = new DataError(ExceptionsMessages.USERNAME_ALREADY_EXISTS);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
