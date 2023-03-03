@@ -121,6 +121,58 @@ public class ExpenseControllerTests {
         .andExpect(jsonPath("$.message").value(ExceptionsMessages.EXPENSE_NOT_FOUND));
   }
 
+  @Test
+  @DisplayName("Edit expense tests: should have status 200 and return edited expense")
+  void edit_expense_success_case() throws Exception {
+    when(this.expenseService.editExpense(this.expense.getExpenseId(), this.expense))
+        .thenReturn(this.expense);
+
+    ResultActions response = this.editExpense(this.expense, this.expense.getExpenseId());
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.expenseId").exists());
+    verify(this.expenseService, times(1))
+        .editExpense(this.expense.getExpenseId(), this.expense);
+  }
+
+  @Test
+  @DisplayName("Edit expense tests: should have status 404 if user not found")
+  void edit_expense_not_found_user_error_case() throws Exception {
+    doThrow(new UserNotFoundException())
+        .when(this.expenseService)
+        .editExpense(this.expense.getExpenseId(), this.expense);
+
+    ResultActions response = this.editExpense(this.expense, this.expense.getExpenseId());
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.USER_NOT_FOUND));
+    verify(this.expenseService, times(1))
+        .editExpense(this.expense.getExpenseId(), this.expense);
+  }
+
+  @Test
+  @DisplayName("Edit expense tests: should have status 404 if expense not found")
+  void edit_expense_not_found_expense_error_case() throws Exception {
+    doThrow(new ExpenseNotFoundException())
+        .when(this.expenseService)
+        .editExpense(this.expense.getExpenseId(), this.expense);
+
+    ResultActions response = this.editExpense(this.expense, this.expense.getExpenseId());
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.EXPENSE_NOT_FOUND));
+  }
+
+  private ResultActions editExpense(Expense payload, UUID expenseId) throws Exception {
+    return this.mockMvc.perform(put("/expense/{expenseId}", expenseId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(new ObjectMapper().writeValueAsString(payload))
+    );
+  }
+
   private ResultActions removeExpense(UUID expenseId) throws Exception {
     return this.mockMvc.perform(delete("/expense/{expenseId}", expenseId));
   }
