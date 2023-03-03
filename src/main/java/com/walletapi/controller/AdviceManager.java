@@ -9,7 +9,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -30,8 +30,8 @@ public class AdviceManager {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
   }
 
-  @ExceptionHandler(AuthenticationException.class)
-  public ResponseEntity<DataError> handleAuthenticationError(AuthenticationException e) {
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<DataError> handleAuthenticationError(BadCredentialsException e) {
     DataError errorResponse = new DataError(ExceptionsMessages.INVALID_LOGIN);
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
   }
