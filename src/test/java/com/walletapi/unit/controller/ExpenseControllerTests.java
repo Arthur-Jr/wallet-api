@@ -5,6 +5,9 @@ import com.walletapi.configure.ApplicationConfig;
 import com.walletapi.configure.WebSecurityConfig;
 import com.walletapi.controller.ExpenseController;
 import com.walletapi.domain.ExpenseDto;
+import com.walletapi.exceptions.ExceptionsMessages;
+import com.walletapi.exceptions.ExpenseNotFoundException;
+import com.walletapi.exceptions.UserNotFoundException;
 import com.walletapi.jwt.JwtService;
 import com.walletapi.model.Expense;
 import com.walletapi.service.ExpenseService;
@@ -23,6 +26,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -74,6 +79,45 @@ public class ExpenseControllerTests {
     response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.expenseId").exists());
+  }
+
+  @Test
+  @DisplayName("Remove expense tests: should have status 204 and return nothing")
+  void remove_expense_success_case() throws Exception {
+    doNothing().when(this.expenseService).removeExpense(this.expense.getExpenseId());
+    ResultActions response = this.removeExpense(this.expense.getExpenseId());
+
+    response.andExpect(status().isNoContent());
+  }
+
+  @Test
+  @DisplayName("Remove expense tests: should have status 404 if user not found")
+  void remove_expense_not_found_user_error_case() throws Exception {
+    doThrow(new UserNotFoundException())
+        .when(this.expenseService)
+        .removeExpense(this.expense.getExpenseId());
+    ResultActions response = this.removeExpense(this.expense.getExpenseId());
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.USER_NOT_FOUND));
+  }
+
+  @Test
+  @DisplayName("Remove expense tests: should have status 404 if expense not found")
+  void remove_expense_not_found_expense_error_case() throws Exception {
+    doThrow(new ExpenseNotFoundException())
+        .when(this.expenseService)
+        .removeExpense(this.expense.getExpenseId());
+    ResultActions response = this.removeExpense(this.expense.getExpenseId());
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.EXPENSE_NOT_FOUND));
+  }
+
+  private ResultActions removeExpense(UUID expenseId) throws Exception {
+    return this.mockMvc.perform(delete("/expense/{expenseId}", expenseId));
   }
 
   private ResultActions addNewExpense(ExpenseDto payload) throws Exception {
