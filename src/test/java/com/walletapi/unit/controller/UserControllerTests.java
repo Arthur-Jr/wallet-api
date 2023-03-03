@@ -139,6 +139,51 @@ public class UserControllerTests {
     verify(this.userService, times(1)).login(this.userDto);
   }
 
+  @Test
+  @DisplayName("Username validations tests: Invalid format email test")
+  void invalid_email_test() throws Exception {
+    this.userDto.setUsername("test");
+    ResultActions response = this.registerUser(this.userDto);
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.INVALID_EMAIL));
+  }
+
+  @Test
+  @DisplayName("Username validations tests: empty email test")
+  void empty_email_test() throws Exception {
+    this.userDto.setUsername(null);
+    ResultActions response = this.registerUser(this.userDto);
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.EMPTY_USERNAME));
+  }
+
+  @Test
+  @DisplayName("Password validations tests: invalid password test")
+  void invalid_password_test() throws Exception {
+    this.userDto.setPassword("test");
+    ResultActions response = this.registerUser(this.userDto);
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.PASSWORD_SIZE));
+  }
+
+  @Test
+  @DisplayName("Password validations tests: empty password test")
+  void empty_password_test() throws Exception {
+    this.userDto.setPassword(null);
+    ResultActions response = this.registerUser(this.userDto);
+
+    response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value(ExceptionsMessages.EMPTY_PASSWORD));
+  }
+
+
   private ResultActions login(UserDto payload) throws Exception {
     return this.mockMvc.perform(post("/user/login")
         .contentType(MediaType.APPLICATION_JSON)
