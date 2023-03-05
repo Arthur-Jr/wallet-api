@@ -1,7 +1,6 @@
 package com.walletapi.controller;
 
 import com.mongodb.MongoException;
-import com.mongodb.MongoWriteException;
 import com.walletapi.exceptions.DataError;
 import com.walletapi.exceptions.ExceptionsMessages;
 import com.walletapi.exceptions.ExpenseNotFoundException;
@@ -10,7 +9,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,15 +25,15 @@ public class AdviceManager {
    * Username duplicity handle.
    */
   @ExceptionHandler({MongoException.class, DuplicateKeyException.class})
-  public ResponseEntity<DataError> handleDuplicity(MongoWriteException e) {
+  public ResponseEntity<DataError> handleDuplicity(Exception e) {
     DataError errorResponse = new DataError(ExceptionsMessages.USERNAME_ALREADY_EXISTS);
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
   }
 
-  @ExceptionHandler(AuthenticationException.class)
-  public ResponseEntity<DataError> handleAuthenticationError(AuthenticationException e) {
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<DataError> handleAuthenticationError(BadCredentialsException e) {
     DataError errorResponse = new DataError(ExceptionsMessages.INVALID_LOGIN);
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
   }
 
   @ExceptionHandler({
@@ -48,7 +47,7 @@ public class AdviceManager {
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<DataError> handleInvalidEmail(MethodArgumentNotValidException e) {
+  public ResponseEntity<DataError> handleInvalidField(MethodArgumentNotValidException e) {
     DataError errorResponse = new DataError(e.getFieldError().getDefaultMessage());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
