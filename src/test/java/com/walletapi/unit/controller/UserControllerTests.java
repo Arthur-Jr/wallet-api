@@ -18,7 +18,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -37,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserController.class)
 @Import({WebSecurityConfig.class, ApplicationConfig.class, JwtService.class})
-@AutoConfigureMockMvc(addFilters = false)
 @DisplayName("User controller tests:")
 public class UserControllerTests {
   @Autowired
@@ -48,6 +46,10 @@ public class UserControllerTests {
 
   @MockBean
   private UserDetailsServiceImp userDetailsService;
+
+  private final JwtService jwtService = new JwtService(
+      "25432A462D4A614E645267556B58703273357638782F413F4428472B4B625065"
+  );
 
   private final UserDto userDto = new UserDto();
   private final User user = new User();
@@ -94,7 +96,9 @@ public class UserControllerTests {
   @DisplayName("Get user by username tests: should have status 200 and return user data")
   void get_user_by_username_success_case() throws Exception {
     when(this.userService.getUserByUsername()).thenReturn(this.user);
-    ResultActions response = this.getUserByUsername();
+    when(this.userDetailsService.loadUserByUsername(this.user.getUsername())).thenReturn(this.user);
+    String token = this.jwtService.generateToken(this.user);
+    ResultActions response = this.getUserByUsername(token);
 
     response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -106,7 +110,9 @@ public class UserControllerTests {
   @DisplayName("Get user by username tests: should have status 404 and return user not found message")
   void get_user_by_username_not_found_error_case() throws Exception {
     when(this.userService.getUserByUsername()).thenThrow(new UserNotFoundException());
-    ResultActions response = this.getUserByUsername();
+    when(this.userDetailsService.loadUserByUsername(this.user.getUsername())).thenReturn(this.user);
+    String token = this.jwtService.generateToken(this.user);
+    ResultActions response = this.getUserByUsername(token);
 
     response.andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound())
@@ -114,6 +120,15 @@ public class UserControllerTests {
     verify(this.userService, times(1)).getUserByUsername();
   }
 
+  @Test
+  @DisplayName("Get user by username tests: should have status 403 and if theres no token")
+  void get_user_by_username_forbidden_error_case() throws Exception {
+    when(this.userService.getUserByUsername()).thenThrow(new UserNotFoundException());
+    ResultActions response = this.getUserByUsername(null);
+
+    response.andExpect(status().isForbidden());
+    verify(this.userService, times(0)).getUserByUsername();
+  }
 
   @Test
   @DisplayName("login tests: should have status 200 and return a JWT token")
@@ -191,7 +206,13 @@ public class UserControllerTests {
         ));
   }
 
-  private ResultActions getUserByUsername() throws Exception {
+  private ResultActions getUserByUsername(String token) throws Exception {
+    if (token != null) {
+      return this.mockMvc.perform(get("/user")
+          .header("Authorization", "Bearer " + token)
+          .contentType(MediaType.APPLICATION_JSON));
+    }
+
     return this.mockMvc.perform(get("/user").contentType(MediaType.APPLICATION_JSON));
   }
 
