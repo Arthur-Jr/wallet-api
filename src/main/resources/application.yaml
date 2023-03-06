@@ -5,7 +5,6 @@ spring:
     import: secrets.properties
   data:
     mongodb:
-      uri:
-        mongodb://${MONGODB_USER:root}:${MONGODB_PASS:root}@${MONGODB_HOST:localhost}:${MONGODB_HOST:27017}/wallet?authSource=admin
+      uri: ${MONGO_URL:mongodb://root:root@localhost:27017/wallet?authSource=admin}
       database: wallet
       auto-index-creation: true
