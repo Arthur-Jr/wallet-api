@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Expenses Controller.
  */
-@CrossOrigin(maxAge = 3600, origins = "*", allowedHeaders = "*")
+//@CrossOrigin(maxAge = 3600, origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/expense")
 public class ExpenseController {
