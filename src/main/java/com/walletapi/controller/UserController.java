@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * User controller.
  */
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(maxAge = 3600, origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/user")
 public class UserController {
