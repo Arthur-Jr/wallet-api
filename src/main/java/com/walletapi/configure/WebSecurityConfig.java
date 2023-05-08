@@ -29,7 +29,7 @@ public class WebSecurityConfig {
   private AuthenticationProvider authenticationProvider;
 
   /**
-   * Filter Chain.
+   * Filter Chain .
    */
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
