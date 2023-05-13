@@ -1,8 +1,10 @@
 package com.walletapi.model;
 
+import com.walletapi.domain.ExchangeRate;
 import com.walletapi.domain.PaymentMethodEnum;
 import com.walletapi.domain.TagEnum;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,4 +24,5 @@ public class Expense {
   private TagEnum tag;
   private PaymentMethodEnum method;
   private LocalDateTime createdAt;
+  private List<ExchangeRate> exchangeRates;
 }
