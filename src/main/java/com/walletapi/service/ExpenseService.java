@@ -35,6 +35,7 @@ public class ExpenseService {
     newExpense.setMethod(expensePayload.getMethod());
     newExpense.setTag(expensePayload.getTag());
     newExpense.setCreatedAt(LocalDateTime.now().withNano(0));
+    newExpense.setExchangeRates(expensePayload.getExchangeRates());
 
     user.addExpense(newExpense);
     this.userRepo.save(user);
